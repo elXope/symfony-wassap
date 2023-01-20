@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Log in!{% endblock %}
+
+{% block body %}
+<div class="w-full h-3 border flex flex-col py-2 px-3 bg-grey-lighter flex flex-row justify-between items-center">
+<div class="w-full max-w-xs">
+<form method="post" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+    {% if error %}
+        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+    {% endif %}
+
+    {% if app.user %}
+        <div class="mb-3">
+            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+        </div>
+    {% endif %}
+
+    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+    <label class="block text-gray-700 text-sm font-bold mb-2" for="inputUsername">Username</label>
+    <input class="form-control shadow appearance-none border border-red-500 rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" type="text" value="{{ last_username }}" name="username" id="inputUsername" autocomplete="username" required autofocus>
+    <label class="block text-gray-700 text-sm font-bold mb-2" for="inputPassword">Password</label>
+    <input type="password" name="password" id="inputPassword" class="form-control shadow appearance-none border border-red-500 rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" autocomplete="current-password" required>
+
+    <input type="hidden" name="_csrf_token"
+           value="{{ csrf_token('authenticate') }}"
+    >
+
+    {#
+        Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
+        See https://symfony.com/doc/current/security/remember_me.html
+
+        <div class="checkbox mb-3">
+            <label>
+                <input type="checkbox" name="_remember_me"> Remember me
+            </label>
+        </div>
+    #}
+
+    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" style="background-color: blue;" type="submit">
+        Sign in
+    </button>
+</form>
+</div>
+</div>
+{% endblock %}
