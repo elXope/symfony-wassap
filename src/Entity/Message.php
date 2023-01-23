@@ -6,6 +6,7 @@ use App\Repository\MessageRepository;
 use DateTime;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MessageRepository::class)]
 class Message
@@ -16,6 +17,7 @@ class Message
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "No puede estar vacío")]
     private ?string $text = null;
 
     #[ORM\ManyToOne(inversedBy: 'messages')]
