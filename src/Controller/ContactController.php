@@ -14,10 +14,26 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class ContactController extends AbstractController
 {
-    #[Route('/contacts/{userId}', name: 'contacts')]
-    public function contacts(ManagerRegistry $doctrine, int $userId): JsonResponse
+    #[Route('/contacts', name: 'contacts')]
+    public function contacts(ManagerRegistry $doctrine): JsonResponse
     {
-
+        $repository = $doctrine->getRepository(User::class);
+        $contacts = $repository->findAll();
+        $data = [];
+        for ($i=0; $i < count($contacts); $i++) { 
+            $data[$contacts[$i]->getId()] = [
+                "username" => $contacts[$i]->getUsername(),
+                "image" => $contacts[$i]->getImage(),
+                "messages" => $contacts[$i]->getMessages()
+            ];
+        }
+        return new JsonResponse($data, Response::HTTP_OK);
     }
+
+    // #[Route('/contacts/{userId}', name: 'contacts')]
+    // public function contacts(ManagerRegistry $doctrine, int $userId): JsonResponse
+    // {
+
+    // }
    
 }
