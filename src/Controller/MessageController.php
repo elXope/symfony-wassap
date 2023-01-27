@@ -9,6 +9,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\Message;
 use DateTimeInterface;
 use Symfony\Component\HttpFoundation\Request;
+use App\Form\MessageFormType;
 
 class MessageController extends AbstractController
 {
@@ -19,7 +20,7 @@ class MessageController extends AbstractController
         $message = new Message();
         $form = $this->createForm(MessageFormType::class, $message);
         $form->handleRequest($request);
-        if($form->isSubmitted() && $form->isValid()){
+        // if($form->isSubmitted() && $form->isValid()){
             $message = $form->getData();
             $message->setFromUser($this->getUser());
             $message->setTimestamp(new DateTimeInterface);
@@ -33,7 +34,7 @@ class MessageController extends AbstractController
                 "timestamp" => $message->getTimestamp()
             ];
             return new JsonResponse($data, Response::HTTP_OK);
-        }
-        return new JsonResponse(null, Response::HTTP_I_AM_A_TEAPOT);
+        // }
+        // return new JsonResponse(null, Response::HTTP_I_AM_A_TEAPOT);
     }
 }
