@@ -32,25 +32,11 @@ $(document).ready(function() {
 
         $.getJSON('/contacts', function(data) {
             $.each(data, function(id, contacto) {
-                // If per a que no entre el mateix contacte que està actiu
-                $('#contacts').append(contactTemplate({userId : id, photo : contacto.image, username : contacto.username, lasttext : ''}));
+                if ($('#user').attr('data-user-id') != id) {
+                    $('#contacts').append(contactTemplate({userId : id, photo : contacto.image, username : contacto.username, lasttext : ''}));
+                }
             });
         });
     })();
-    // (function() {
-    //     $('#contacts').html('');
-    //     $.getJSON('/contacts', function(data) {
-    //         $.each(data, function(id, contacto) {
-    //             // if(true) {// id != app.user.id) {
-    //                 $('#contacts').append($('#templateContact').html());
-    //                 let i = $('.contact').length;
-    //                 // $('.contact--id:first-child').attr('data-id', id);
-    //                 // $('.contact--image:first-child').attr('src', "img/" + contacto.image);
-    //                 // $('.contact--userName:first-child').text(contacto.username);
-    //                 // $('.contact--info:first-child').text('');
-    //             // }
-    //         });
-    //     });
-    // })();
 
 });
