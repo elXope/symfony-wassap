@@ -24,7 +24,6 @@ class ContactController extends AbstractController
             $data[$contacts[$i]->getId()] = [
                 "username" => $contacts[$i]->getUsername(),
                 "image" => $contacts[$i]->getImage(),
-                "messages" => $contacts[$i]->getMessages()
             ];
         }
         return new JsonResponse($data, Response::HTTP_OK);

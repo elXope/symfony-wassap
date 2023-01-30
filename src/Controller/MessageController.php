@@ -23,9 +23,29 @@ class MessageController extends AbstractController
     {
         $messageRepo = $doctrine->getRepository(Message::class);
         $userRepo = $doctrine->getRepository(User::class);
-        $messages = $messageRepo->findBy(['fromUser' => $userRepo->findOneBy(['id' => $fromUserid]), 'toUser' => $userRepo->findOneBy(['id' => $toUserid])]);
-        $serializer = new Serializer([new ObjectNormalizer()], [new JsonEncoder()]);
-        return new JsonResponse($serializer->serialize($messages, 'json'), Response::HTTP_OK);
+        $messages = $messageRepo->findConversation($userRepo->find($fromUserid), $userRepo->find($toUserid));
+        $data = [];
+        foreach ($messages as $message) {
+            array_push($data, [
+                'id' => $message->getFromUser()->getId(),
+                'text' => $message->getText(),
+                'timestamp' =>$message->getTimestamp()->format('Y-m-d H:i:s')
+            ]);
+        }
+        return new JsonResponse($data, Response::HTTP_OK);
+    }
+
+    #[Route('/message/last/{fromUserid}/{toUserid}')]
+    public function lastMessage(ManagerRegistry $doctrine, $fromUserid, $toUserid): JsonResponse
+    {
+        $messageRepo = $doctrine->getRepository(Message::class);
+        $userRepo = $doctrine->getRepository(User::class);
+        $message = $messageRepo->findLast($userRepo->find($fromUserid), $userRepo->find($toUserid));
+        $data = [
+            'text' => $message->getText(),
+            'timestamp' => $message->getTimestamp()->format('Y-m-d H:i:s')
+        ];
+        return new JsonResponse($data, Response::HTTP_OK);
     }
 
     #[Route('/message/toUser/{toUserid}', name: 'app_message')]
@@ -41,7 +61,7 @@ class MessageController extends AbstractController
             $data = new DateTime();
             $message->setTimestamp($data);
             $userRepo = $doctrine->getRepository(User::class);
-            $message->setToUser($userRepo->findOneBy(['id' => $toUserid]));
+            $message->setToUser($userRepo->find($toUserid));
             $entityManager = $doctrine->getManager();
             $entityManager->persist($message);
             $entityManager->flush();

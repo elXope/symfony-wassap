@@ -124,10 +124,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     // /**
     //  * @return Collection<int, Message>
     //  */
-    // public function getMessages(): Collection
-    // {
-    //     return $this->messages;
-    // }
+    public function getMessages(): Collection
+    {
+        return $this->messages;
+    }
 
     // public function addMessage(Message $message): self
     // {
