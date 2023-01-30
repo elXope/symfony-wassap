@@ -7,24 +7,41 @@ use Symfony\Component\HttpFoundation\{JsonResponse, Response};
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\Message;
+use App\Entity\User;
 use DateTimeInterface;
 use Symfony\Component\HttpFoundation\Request;
 use App\Form\MessageFormType;
+use DateTime;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 class MessageController extends AbstractController
 {
+    #[Route('/messages/{fromUserid}/{toUserid}')]
+    public function sentMessages(ManagerRegistry $doctrine, $fromUserid, $toUserid): JsonResponse
+    {
+        $messageRepo = $doctrine->getRepository(Message::class);
+        $userRepo = $doctrine->getRepository(User::class);
+        $messages = $messageRepo->findBy(['fromUser' => $userRepo->findOneBy(['id' => $fromUserid]), 'toUser' => $userRepo->findOneBy(['id' => $toUserid])]);
+        $serializer = new Serializer([new ObjectNormalizer()], [new JsonEncoder()]);
+        return new JsonResponse($serializer->serialize($messages, 'json'), Response::HTTP_OK);
+    }
+
     #[Route('/message/toUser/{toUserid}', name: 'app_message')]
-    public function send(ManagerRegistry $doctrine, Request $request, $toUserid): JsonResponse
+    public function send(ManagerRegistry $doctrine, Request $request, $toUserid): Response
     {
         
         $message = new Message();
         $form = $this->createForm(MessageFormType::class, $message);
         $form->handleRequest($request);
-        // if($form->isSubmitted() && $form->isValid()){
+        if($form->isSubmitted()){ // NO PUC VALIDAR
             $message = $form->getData();
             $message->setFromUser($this->getUser());
-            $message->setTimestamp(new DateTimeInterface);
-            $message->setToUser($toUserid);
+            $data = new DateTime();
+            $message->setTimestamp($data);
+            $userRepo = $doctrine->getRepository(User::class);
+            $message->setToUser($userRepo->findOneBy(['id' => $toUserid]));
             $entityManager = $doctrine->getManager();
             $entityManager->persist($message);
             $entityManager->flush();
@@ -34,7 +51,9 @@ class MessageController extends AbstractController
                 "timestamp" => $message->getTimestamp()
             ];
             return new JsonResponse($data, Response::HTTP_OK);
-        // }
-        // return new JsonResponse(null, Response::HTTP_I_AM_A_TEAPOT);
+        }
+        return $this->render('partials/_textForm.html.twig', [
+            'form' => $form->createView()
+        ]);
     }
 }

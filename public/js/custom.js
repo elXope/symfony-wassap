@@ -30,8 +30,8 @@ $(document).ready(function() {
             if(evento.keyCode == 13) {
                 evento.preventDefault();
                 if($(this).text().length <= 255) {
-                $.post(`/message/toUser/${$('.active').attr('data-id')}`);
-                $(this).text('');
+                $.post(`/message/toUser/${$('.active').attr('data-id')}`, $(this).serialize());
+                $(this).val('');
                 }
             }
         });
@@ -67,3 +67,4 @@ const contactTemplate =  ({userId, photo, username, lasttext}) => `
         </div>
     </div>
 `;
+

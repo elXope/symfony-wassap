@@ -12,9 +12,6 @@ class PageController extends AbstractController
     #[Route('/', name: 'index')]
     public function index(): Response
     {
-        $form = $this->createForm(MessageFormType::class);
-        return $this->render('page/index.html.twig',[
-            'form' => $form->createView()
-        ]);
+        return $this->render('page/index.html.twig',[]);
     }
 }

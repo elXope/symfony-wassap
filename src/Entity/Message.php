@@ -18,7 +18,7 @@ class Message
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "No puede estar vacío")]
-    private ?string $text = null;
+    private ?string $text;
 
     #[ORM\ManyToOne(inversedBy: 'messages')]
     #[ORM\JoinColumn(nullable: false)]
@@ -49,7 +49,7 @@ class Message
         return $this->text;
     }
 
-    public function setText(string $text): self
+    public function setText(?string $text): self
     {
         $this->text = $text;
 
