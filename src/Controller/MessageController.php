@@ -8,13 +8,9 @@ use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\Message;
 use App\Entity\User;
-use DateTimeInterface;
 use Symfony\Component\HttpFoundation\Request;
 use App\Form\MessageFormType;
 use DateTime;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
 
 class MessageController extends AbstractController
 {
