@@ -2,7 +2,6 @@ $(document).ready(function() {
 
     // Gestionar contactes
     (function() {
-
         $.getJSON('/contacts', function(data) {
             $.each(data, function(id, contacto) {
                 if ($('#user').attr('data-user-id') != id) {
@@ -31,7 +30,54 @@ $(document).ready(function() {
 
     })();
 
-    // Actualitzar pàgina al carregar
+    // connexió websocket i actualitzar
+    (function() {
+        //Open a WebSocket connection.
+        websocket = new WebSocket("ws://localhost:9000/");
+        
+        //Connected to server
+        websocket.onopen = function(ev) {
+            console.log('Connected to server ');
+            let msg = {
+                type : 'chatData',
+                fromUserId : $('#user').attr('data-user-id'),
+                toUserId : 1
+            };
+            websocket.send(JSON.stringify(msg));
+        }
+        
+        //Connection close
+        websocket.onclose = function(ev) { 
+            console.log('Disconnected');
+        };
+        websocket.onmessage = function(evt) { 
+            let scroll = document.getElementById('scroll');
+            var response = JSON.parse(evt.data).message; //PHP sends Json data
+            if(response.type == "chatmsg"){
+                if (response.fromUserId == $('#user').attr('data-user-id')) {
+                    $('#messages').append(messageTemplateMe({text : response.text, timestamp : response.timestamp.date.split('.')[0]}));
+                    scroll.scrollIntoView();
+                } else if(response.toUserId == $('#user').attr('data-user-id')){
+                    $('div[data-id='+ response.fromUserId +']').children('.contact-info-container').children('.contact-info').children('.text-xs').children('.contact--lastTimestamp').text(response.timestamp.date.split('.')[0]);
+                    $('div[data-id='+ response.fromUserId +']').children('.contact-info-container').children('.text-grey-dark').text(response.text);
+                    if(response.fromUserId == $('.active').attr('data-id')){
+                        $('#messages').append(messageTemplateOther({text : response.text, timestamp : response.timestamp.date.split('.')[0]}));
+                        scroll.scrollIntoView();
+                    } else {
+                        $('div[data-id='+ response.fromUserId +']').children('.contact-info-container').children('.contact-info').children('.text-xs').children('.contact-numMessages').removeClass('hidden');
+                        let nMessages = parseInt($('div[data-id='+ response.fromUserId +']').children('.contact-info-container').children('.contact-info').children('.text-xs').children('.contact-numMessages').text());
+                        $('div[data-id='+ response.fromUserId +']').children('.contact-info-container').children('.contact-info').children('.text-xs').children('.contact-numMessages').text(++nMessages);
+                    }
+                }
+            }
+            //hacer lo que corresponda con response
+        };
+        
+        //Error
+        websocket.onerror = function(ev) { 
+            console.log('Error '+ev.data);
+        };
+    })();
 });
 
 const contactTemplate =  ({userId, photo, username, lasttimestamp = '', lasttext = ''}) => `
@@ -91,6 +137,8 @@ const messageTemplateOther = ({text, timestamp}) => `
 function apretarContacto() {
     $('.active').removeClass('active');
     $(this).addClass("active");
+    $(this).children('.contact-info-container').children('.contact-info').children('.text-xs').children('.contact-numMessages').text('0');
+    $(this).children('.contact-info-container').children('.contact-info').children('.text-xs').children('.contact-numMessages').addClass('hidden');
     $('#convImg').html(
         `<img class="w-10 h-10 rounded-full" src="${$('.active').children('.contact-img-container').children('.contact-img').attr('src')}">`
     );
