@@ -34,7 +34,7 @@ $(document).ready(function() {
     // Actualitzar pàgina al carregar
 });
 
-const contactTemplate =  ({userId, photo, username, lasttimestamp, lasttext}) => `
+const contactTemplate =  ({userId, photo, username, lasttimestamp = '', lasttext = ''}) => `
     <div data-id="${userId}" class="contact px-3 flex bg-white border-2 border-gray-darker items-center cursor-pointer">
         <div class='contact-img-container'>
             <img  class="contact-img h-12 w-12 rounded-full"

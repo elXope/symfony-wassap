@@ -41,10 +41,15 @@ class MessageController extends AbstractController
         $messageRepo = $doctrine->getRepository(Message::class);
         $userRepo = $doctrine->getRepository(User::class);
         $message = $messageRepo->findLast($userRepo->find($fromUserid), $userRepo->find($toUserid));
-        $data = [
-            'text' => $message->getText(),
-            'timestamp' => $message->getTimestamp()->format('Y-m-d H:i:s')
-        ];
+        if($message) {
+            $data = [
+                'text' => $message->getText(),
+                'timestamp' => $message->getTimestamp()->format('Y-m-d H:i:s')
+            ];
+        } else {
+            $data = null;
+        }
+        
         return new JsonResponse($data, Response::HTTP_OK);
     }
 
